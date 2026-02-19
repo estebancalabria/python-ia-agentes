@@ -150,3 +150,12 @@ while prompt != "salir":
   prompt = input("Ingrese otro prompt: ")
 
 ```
+
+# Cuestiones a considerar
+
+* En generar cuando se usa un modelo de lenguaje desde python se utilizan respuestas en formato JSON
+* Existen parametros adicionales como la temperatura que me permiten controlas la respuesta del modelo de lenguaje
+
+# Glosario
+
+* Curl : Linea de comandos para hacer llamadas http
