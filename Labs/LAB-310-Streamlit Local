@@ -1,0 +1,198 @@
+# 🚀 Laboratorio: Crear una App Web con Streamlit (Entorno Local)
+
+---
+
+## 🎯 Objetivo
+
+Crear una aplicación web interactiva utilizando:
+
+* 🐍 Python
+* 🚀 Streamlit
+* 💻 Entorno local (sin Colab, sin ngrok)
+
+Al finalizar tendrás una app funcionando en:
+
+```
+http://localhost:8501
+```
+
+---
+
+# 📋 Requisitos
+
+* Python 3.9 o superior
+* pip instalado
+* Terminal o PowerShell
+
+Verificar instalación:
+
+```bash
+python --version
+pip --version
+```
+
+---
+
+# 🔧 PASO 1 — Crear entorno del proyecto (recomendado)
+
+```bash
+mkdir laboratorio_streamlit
+cd laboratorio_streamlit
+```
+
+Opcional pero profesional 👇
+
+```bash
+python -m venv venv
+```
+
+Activar entorno:
+
+### Windows
+
+```bash
+venv\Scripts\activate
+```
+
+### Mac / Linux
+
+```bash
+source venv/bin/activate
+```
+
+---
+
+# 📦 PASO 2 — Instalar Streamlit
+
+```bash
+pip install streamlit
+```
+
+Verificar:
+
+```bash
+streamlit --version
+```
+
+---
+
+# 📝 PASO 3 — Crear la aplicación
+
+Crear archivo:
+
+```
+app.py
+```
+
+Y pegar este código:
+
+```python
+import streamlit as st
+
+# Configuración básica
+st.set_page_config(
+    page_title="Laboratorio Streamlit",
+    page_icon="🚀",
+    layout="centered"
+)
+
+# Título
+st.title("🚀 Mi Primera App con Streamlit")
+
+st.write("Este laboratorio convierte texto a MAYÚSCULAS y realiza cálculos simples.")
+
+st.divider()
+
+# Entrada de texto
+texto = st.text_input("✏️ Escribe un texto:")
+
+if texto:
+    st.success(texto.upper())
+
+st.divider()
+
+# Slider numérico
+st.subheader("🔢 Cálculo Matemático")
+
+numero = st.slider("Elegí un número", 0, 100, 10)
+
+st.write("Número al cuadrado:", numero ** 2)
+
+st.write("Número al cubo:", numero ** 3)
+
+st.divider()
+
+# Botón
+if st.button("Mostrar mensaje motivador"):
+    st.info("🚀 Estás construyendo aplicaciones reales con Python.")
+```
+
+---
+
+# ▶️ PASO 4 — Ejecutar la app
+
+En la terminal:
+
+```bash
+streamlit run app.py
+```
+
+Se abrirá automáticamente el navegador en:
+
+```
+http://localhost:8501
+```
+
+Si no se abre, copiá la URL manualmente.
+
+---
+
+# 🧠 Conceptos que estás enseñando
+
+* Script → aplicación web
+* Componentes interactivos:
+
+  * `text_input`
+  * `slider`
+  * `button`
+  * `st.success`
+  * `st.info`
+* Renderizado automático
+* Reactividad (no hay necesidad de while loops)
+* Arquitectura backend/frontend integrada
+
+---
+
+# 🧪 Parte 2 (Desafío para alumnos)
+
+Agregar:
+
+1. Un `selectbox` con opciones:
+
+   * Sumar
+   * Restar
+   * Multiplicar
+   * Dividir
+
+2. Dos inputs numéricos
+
+3. Mostrar resultado según operación elegida
+
+---
+
+# 🏆 BONUS — Versionarlo correctamente
+
+Crear archivo:
+
+```
+requirements.txt
+```
+
+Con contenido:
+
+```
+streamlit
+```
+
+Así ya queda profesional para deploy.
+
