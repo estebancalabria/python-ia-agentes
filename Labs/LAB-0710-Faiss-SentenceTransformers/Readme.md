@@ -1,7 +1,3 @@
-Perfecto. Vamos a armar un **laboratorio paso a paso** de RAG usando **FAISS local** y **Python puro** (sin Gradio ni Colab), usando `input()` y `print()` para que los alumnos puedan probarlo en cualquier entorno. También incluimos el link oficial a FAISS.
-
----
-
 # Laboratorio: Sistema RAG Básico con FAISS Local 🧠
 
 ## Introducción 📝
