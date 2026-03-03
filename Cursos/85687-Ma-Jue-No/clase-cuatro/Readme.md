@@ -43,6 +43,30 @@ Respuesta : El mejor amigo del hombre es el perro, como el perro de tu abuela qu
          * Cachea las respuestas generadas
 
 * NotebookLM tiene una arquitectura asi por Dentro
+
+```python
+from sentence_transformers import SentenceTransformer, util
+import torch
+
+documentos = [
+    "Python es un lenguaje de programación de alto nivel",
+    "Python se utiliza en una amplia variedad de aplicaciones",
+    "Donald Trump ataca a Bolivia y se hace con el control de Suamerica",
+    "Los animales son buenos"
+]
+
+modelo_embeddings = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+embeddings = modelo_embeddings.encode(documentos)
+
+pregunta = input("Ingrese su pregunta:")
+embedding_pregunta = modelo_embeddings.encode(pregunta)
+
+similitudes = util.cos_sim(embedding_pregunta, embeddings)[0]
+top_resultados = torch.topk(similitudes, 1)
+contexto = "\n".join([documentos[i] for i in top_resultados.indices])
+
+print(contexto)
+```
   
 # Fine Tunning
 
@@ -51,7 +75,7 @@ Respuesta : El mejor amigo del hombre es el perro, como el perro de tu abuela qu
 * Ver canal
    * https://www.youtube.com/@machinelearnear
       * https://www.youtube.com/watch?v=bIZMgHK8Y-8
-> 
+
 
 # System prompts
 
