@@ -11,6 +11,48 @@
   * El boton "Use in colab"
     * Usamos el GPT2
 
+# RAG (Retival Augmented Generation)
+
+> https://www.instagram.com/p/DVcBRoGFS8a/?img_index=1
+
+Ejemplo de RAG:
+
+```
+D1: (perro)  -> [1,1,1,1,1]
+D2: (can)    -> [1,1,1,1,0.999]
+D3: (el perro de mi abuela es muy grande y se llama Alberto)  ->  [1,1,2,3,4]
+D4: (juan es un cabron) -> [5,5,5,5,5]
+
+PROMPT ORIGINAL: (Cual es el major amigo del hombre?) -> [1,1,1,1,0.7]
+
+(Busco documentos relacionados)
+
+PROMTP MODIFICADO :La pregunta es "Cual es el major amigo del hombre?" , los documentos relacionados a la pregunt son {D1,D2,D3} <<< NUEVO PROMP
+
+Respuesta : El mejor amigo del hombre es el perro, como el perro de tu abuela que se llama Alberto
+```
+
+* Tenemos
+   * RAG (Retrival Augmented Generation)
+      * Desventajas : Para cada consulta tenes que calcularle el embeding si usas modelos remotos
+         * Le pagas x2 : El calculo de embeding y las consultas
+   * Optimizaciones
+      * CAG (Context Augmented Generation)
+         * OJO, si todos los documentos de tu charbot ENTRAN en la ventana de contexto, no lo gusardes en una base vectorial, metelos como parte del system prompt
+      * CAG (Cache Augmented Generation)
+         * Cachea las respuestas generadas
+
+* NotebookLM tiene una arquitectura asi por Dentro
+  
+# Fine Tunning
+
+* Bueno si quiero puedo evitar usar RAG y hacer FINE TUNNING
+* ES costosisimo!
+* Ver canal
+   * https://www.youtube.com/@machinelearnear
+      * https://www.youtube.com/watch?v=bIZMgHK8Y-8
+> 
+
 # System prompts
 
 Hay repos con Leaks de System Prompts como este:
