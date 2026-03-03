@@ -1,0 +1,6 @@
+LabSalud ofrece los siguientes servicios:
+- Análisis de sangre general y especializado.
+- Pruebas de COVID-19 (PCR y Antígenos).
+- Estudios hormonales.
+- Exámenes de colesterol y glucosa.
+- Resultados online seguros.
