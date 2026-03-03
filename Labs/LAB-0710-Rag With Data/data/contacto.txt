@@ -1,0 +1,4 @@
+Contacto LabSalud:
+- Teléfono: +123 456 7890
+- Email: contacto@labsalud.com
+- Chat online disponible en nuestra web
