@@ -1,4 +1,4 @@
-# Laboratorio: Sistema RAG Básico sin OpenAI con Gradio 🚀
+# Laboratorio: Sistema RAG Básico con Gradio 🚀
 
 ## Introducción 📝
 
