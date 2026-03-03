@@ -1,0 +1,7 @@
+Horarios:
+- Lunes a Viernes: 7:00 - 19:00
+- Sábados: 8:00 - 12:00
+
+Ubicación:
+- Dirección: Av. Salud 123, Ciudad, País
+- Estacionamiento disponible
