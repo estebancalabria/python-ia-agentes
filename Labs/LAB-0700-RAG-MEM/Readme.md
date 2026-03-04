@@ -1,4 +1,4 @@
-# 🧪 Laboratorio: Sistema RAG Básico en Consola (sin Gradio) 🚀
+# 🧪 Laboratorio: Sistema RAG Básico en Memoria 🚀
 
 ## 📝 Introducción
 
@@ -6,7 +6,7 @@ En este laboratorio vamos a construir un **sistema RAG (Retrieval-Augmented Gene
 
 * 📄 Carga documentos
 * 🔢 Genera embeddings
-* 🔎 Recupera los fragmentos más relevantes según una pregunta
+* 🔎 Recupera los fragmentos más relevantes según una pregunta del usuario
 
 Todo esto usando únicamente:
 
@@ -14,7 +14,7 @@ Todo esto usando únicamente:
 * Hugging Face
 * SentenceTransformers
 
-⚠️ No usamos OpenAI ni interfaces web. Solo consola.
+⚠️ Sin OpenAI ni interfaces web, solo consola.
 
 ---
 
@@ -45,175 +45,152 @@ import torch
 
 ---
 
-## 💡 Paso 3: Cargar modelo de embeddings
+## 💡 Paso 3: Definir documentos de ejemplo
 
-Usaremos el modelo:
-
-```python
-modelo_embeddings = SentenceTransformer('all-MiniLM-L6-v2')
-```
-
-Este modelo convierte texto en vectores numéricos (embeddings).
-
----
-
-## 📄 Paso 4: Definir documentos de ejemplo
+Estos son los textos que nuestro sistema podrá consultar:
 
 ```python
 documentos = [
-    "Python es un lenguaje de programación muy popular.",
-    "SentenceTransformers permite generar embeddings fácilmente.",
-    "Los sistemas RAG combinan recuperación de información con generación de texto."
+    "Python es un lenguaje de programación de alto nivel",
+    "Python se utiliza en una amplia variedad de aplicaciones",
+    "Donald Trump ataca a Bolivia y se hace con el control de Suamerica",
+    "Los animales son buenos"
 ]
 ```
 
-### Generamos los embeddings:
-
-```python
-embeddings_docs = modelo_embeddings.encode(documentos, convert_to_tensor=True)
-```
-
-🔎 Aquí estamos transformando cada documento en un vector matemático.
-
 ---
 
-## 🔍 Paso 5: Función de recuperación de contexto
+## 💻 Paso 4: Cargar el modelo de embeddings
 
-Esta función:
-
-1. Genera el embedding de la pregunta
-2. Calcula similitud coseno
-3. Devuelve los documentos más relevantes
+El modelo `all-MiniLM-L6-v2` convierte cada texto en un vector numérico que podemos comparar matemáticamente:
 
 ```python
-def recuperar_contexto(pregunta, top_k=2):
-    
-    # 1️⃣ Generar embedding de la pregunta
-    embedding_pregunta = modelo_embeddings.encode(pregunta, convert_to_tensor=True)
-    
-    # 2️⃣ Calcular similitud coseno
-    similitudes = util.cos_sim(embedding_pregunta, embeddings_docs)[0]
-    
-    # 3️⃣ Obtener los índices más similares
-    top_resultados = torch.topk(similitudes, k=top_k)
-    
-    # 4️⃣ Construir contexto
-    contexto = "\n".join([documentos[i] for i in top_resultados.indices])
-    
-    return contexto
+modelo_embeddings = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 ```
 
 ---
 
-## 🧠 Paso 6: Loop interactivo con input() y print()
-
-En vez de interfaz web, creamos un bucle en consola:
+## 🔢 Paso 5: Generar embeddings de los documentos
 
 ```python
-def iniciar_rag():
-    print("====================================")
-    print(" Sistema RAG Básico en Consola ")
-    print(" Escribe 'salir' para terminar")
-    print("====================================\n")
-    
-    while True:
-        pregunta = input("Tu pregunta: ")
-        
-        if pregunta.lower() == "salir":
-            print("Saliendo del sistema...")
-            break
-        
-        contexto = recuperar_contexto(pregunta)
-        
-        print("\n--- Contexto relevante encontrado ---")
-        print(contexto)
-        print("--------------------------------------\n")
+embeddings = modelo_embeddings.encode(documentos)
 ```
+
+> ⚡ Cada documento ahora es un **vector numérico**. Esto nos permite medir qué tan similares son los documentos entre sí o respecto a una pregunta.
 
 ---
 
-## 🚀 Paso 7: Ejecutar el sistema
+## 🔍 Paso 6: Recuperación de documentos relevantes
+
+Dividimos este proceso en **subpasos** para mayor claridad:
+
+### 6.1: Pedir la pregunta al usuario
 
 ```python
-if __name__ == "__main__":
-    iniciar_rag()
+pregunta = input("Ingrese su pregunta: ")
 ```
+
+### 6.2: Convertir la pregunta en embedding
+
+```python
+embedding_pregunta = modelo_embeddings.encode(pregunta)
+```
+
+> 🧠 Ahora tenemos un vector que representa la semántica de la pregunta.
+
+### 6.3: Calcular similitud coseno
+
+```python
+similitudes = util.cos_sim(embedding_pregunta, embeddings)[0]
+```
+
+> 📊 La similitud coseno mide cuán parecida es la pregunta a cada documento. Va de -1 (totalmente diferente) a 1 (idéntico).
+
+### 6.4: Obtener el documento más relevante
+
+```python
+top_resultados = torch.topk(similitudes, 1)
+```
+
+> 🏆 `torch.topk` nos devuelve el índice del documento con mayor similitud.
+
+### 6.5: Construir y mostrar el contexto
+
+```python
+contexto = "\n".join([documentos[i] for i in top_resultados.indices])
+
+print("-------------------------------------------")
+print("Contexto más relevante encontrado:")
+print(contexto)
+print("-------------------------------------------")
+```
+
+> ✅ Ahora vemos en consola el fragmento más relevante para nuestra pregunta.
 
 ---
 
-# 🧩 Código Completo
+## 💻 Paso 7: Ejemplo de ejecución
+
+Usando los documentos definidos, se podrían hacer estas consultas:
+
+| Pregunta   | Documento seleccionado                                             | Explicación                                                |
+| ---------- | ------------------------------------------------------------------ | ---------------------------------------------------------- |
+| software   | Python es un lenguaje de programación de alto nivel                | `"software"` se relaciona con programación y Python        |
+| politica   | Donald Trump ataca a Bolivia y se hace con el control de Suamerica | `"politica"` está asociada a gobierno y control de países  |
+| naturaleza | Los animales son buenos                                            | `"naturaleza"` se relaciona con animales y entorno natural |
+
+---
+
+## 🧩 Código Completo Actualizado
 
 ```python
-# pip install sentence-transformers
-
 from sentence_transformers import SentenceTransformer, util
 import torch
 
-# 1️⃣ Cargar modelo
-modelo_embeddings = SentenceTransformer('all-MiniLM-L6-v2')
-
-# 2️⃣ Documentos de ejemplo
+# Documentos
 documentos = [
-    "Python es un lenguaje de programación muy popular.",
-    "SentenceTransformers permite generar embeddings fácilmente.",
-    "Los sistemas RAG combinan recuperación de información con generación de texto."
+    "Python es un lenguaje de programación de alto nivel",
+    "Python se utiliza en una amplia variedad de aplicaciones",
+    "Donald Trump ataca a Bolivia y se hace con el control de Suamerica",
+    "Los animales son buenos"
 ]
 
-# 3️⃣ Generar embeddings
-embeddings_docs = modelo_embeddings.encode(documentos, convert_to_tensor=True)
+# Cargar modelo de embeddings
+modelo_embeddings = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
-# 4️⃣ Función de recuperación
-def recuperar_contexto(pregunta, top_k=2):
-    
-    embedding_pregunta = modelo_embeddings.encode(pregunta, convert_to_tensor=True)
-    similitudes = util.cos_sim(embedding_pregunta, embeddings_docs)[0]
-    top_resultados = torch.topk(similitudes, k=top_k)
-    
-    contexto = "\n".join([documentos[i] for i in top_resultados.indices])
-    
-    return contexto
+# Generar embeddings de los documentos
+embeddings = modelo_embeddings.encode(documentos)
 
-# 5️⃣ Loop principal
-def iniciar_rag():
-    print("====================================")
-    print(" Sistema RAG Básico en Consola ")
-    print(" Escribe 'salir' para terminar")
-    print("====================================\n")
-    
-    while True:
-        pregunta = input("Tu pregunta: ")
-        
-        if pregunta.lower() == "salir":
-            print("Saliendo del sistema...")
-            break
-        
-        contexto = recuperar_contexto(pregunta)
-        
-        print("\n--- Contexto relevante encontrado ---")
-        print(contexto)
-        print("--------------------------------------\n")
+# Paso 6: Recuperación de documentos relevantes
+pregunta = input("Ingrese su pregunta:")
 
-# 6️⃣ Ejecutar
-if __name__ == "__main__":
-    iniciar_rag()
+# 6.2 Generar embedding de la pregunta
+embedding_pregunta = modelo_embeddings.encode(pregunta)
+
+# 6.3 Calcular similitud coseno
+similitudes = util.cos_sim(embedding_pregunta, embeddings)[0]
+
+# 6.4 Obtener el documento más relevante
+top_resultados = torch.topk(similitudes, 1)
+
+# 6.5 Construir y mostrar contexto
+contexto = "\n".join([documentos[i] for i in top_resultados.indices])
+
+print("-------------------------------------------")
+print("Contexto más relevante encontrado:")
+print(contexto)
+print("-------------------------------------------")
 ```
 
 ---
 
-# 🎉 Conclusión
+## 🎉 Conclusión
 
-Ahora tienes un:
+Con este laboratorio ahora tienes un **sistema RAG básico en consola**:
 
-✅ Sistema RAG básico
-✅ 100% local
-✅ Sin OpenAI
-✅ Sin interfaz web
-✅ Ejecutable desde terminal
+* ✅ Local y simple
+* ✅ 100% en Python
+* ✅ Sin OpenAI ni interfaz web
+* ✅ Didáctico paso a paso
 
-Este laboratorio es ideal para entender claramente la arquitectura RAG:
-
-1. Documentos
-2. Embeddings
-3. Similaridad
-4. Recuperación
-
+> 💡 Tip: Puedes aumentar `top_k` si quieres mostrar más de un documento relevante. Por ejemplo, `torch.topk(similitudes, 2)` mostrará los dos más relevantes.
