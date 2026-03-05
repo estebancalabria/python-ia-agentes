@@ -30,9 +30,18 @@
 
 * https://gallantlab.org/viewer-huth-2016/
 
+---
+
 # Rag
 
 ## Buenas Practicas
+
+* A la hora de armar un RAG es muy comun tener un documento con FAQ de respuestas conocidas, esperadas, deseables de como respode el agente
+* Hay que estudiar como dividir un documento grade en chunks que tengan sentidos
+   * Como referencia que cada chunk tenga alrededor de 500 palabras
+   * Cada chunk en lo posible tiene que ser autocontenido y tener sentido
+   * IDEA: Por ejemplo usando la IA para generar los chunks
+* Preprocesar el documento para ordenarlo y eliminar, caraceres especiales, html residual, salto de linea invalidos
 
 ## Chunks
 
