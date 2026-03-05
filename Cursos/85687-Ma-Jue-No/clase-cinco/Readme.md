@@ -342,6 +342,104 @@ if __name__ == "__main__":
 
 ## Base de Datos Vectoriales
 
+Instalando librerias
+```python
+!pip install faiss-cpu
+```
 
+Utilizando Indice Vectorial
+```python
+from sentence_transformers import SentenceTransformer, util
+import torch
+import faiss
 
+faq_texto = """
+¿Que es Python?
+Python es un lenguaje de programación de alto nivel
+---
+¿Donde se utilizar Python?
+Python se utiliza en una amplia variedad de aplicaciones
+---
+¿A quien ataco Trump?
+Donald Trump ataca a Bolivia y se hace con el control de Suamerica
+---
+¿Que animales son domesticos?
+Los animales son buenos y los domesticos son perros, gatos, aves y conejos
+"""
 
+chunks = [chunk.strip() for chunk in faq_texto.strip().split('---')]
+
+modelo_embeddings = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+embeddings = modelo_embeddings.encode(chunks)
+
+dimension_embedding = embeddings.shape[1];
+tabla_embeddings = faiss.IndexFlatL2(dimension_embedding)
+tabla_embeddings.add(embeddings)
+
+pregunta = input("Escriba su pregunta:")
+embedding_pregunta = modelo_embeddings.encode([pregunta]);
+
+distancia, indice = tabla_embeddings.search(embedding_pregunta,1)
+#print(indice)
+
+print("Documento recuperado")
+print(chunks[indice[0][0]])
+print("Distancia a la pregunta:");
+print(distancia);
+
+```
+
+## Persistiendo la base de datos
+
+* Celda 1 : Los documentos en memoria (en realidad van en disco pero los hacemos en memoria para simplificar)
+```python
+# Para tener los documentos en memoria
+from sentence_transformers import SentenceTransformer, util
+import torch
+import faiss
+
+faq_texto = """
+¿Que es Python?
+Python es un lenguaje de programación de alto nivel
+---
+¿Donde se utilizar Python?
+Python se utiliza en una amplia variedad de aplicaciones
+---
+¿A quien ataco Trump?
+Donald Trump ataca a Bolivia y se hace con el control de Suamerica
+---
+¿Que animales son domesticos?
+Los animales son buenos y los domesticos son perros, gatos, aves y conejos
+"""
+
+chunks = [chunk.strip() for chunk in faq_texto.strip().split('---')]
+```
+
+* Celda 2 : Creo el archivo fisico persistente
+```python
+#PAra generar la tabla de embedings persistente
+modelo_embeddings = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+embeddings = modelo_embeddings.encode(chunks)
+
+dimension_embedding = embeddings.shape[1];
+tabla_embeddings = faiss.IndexFlatL2(dimension_embedding)
+tabla_embeddings.add(embeddings)
+
+faiss.write_index(tabla_embeddings, "tabla_embeddings.index")
+```
+
+* Celda 3 : Levanto el indice de disco
+```python
+indice_recuperado = faiss.read_index("tabla_embeddings.index")
+
+pregunta = input("Escriba su pregunta:")
+embedding_pregunta = modelo_embeddings.encode([pregunta]);
+
+distancia, indice = indice_recuperado.search(embedding_pregunta,1)
+#print(indice)
+
+print("Documento recuperado")
+print(chunks[indice[0][0]])
+print("Distancia a la pregunta:");
+print(distancia);
+```
