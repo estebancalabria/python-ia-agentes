@@ -18,9 +18,17 @@
 
 # Uso de API
 
-* Temperatura : Valor que se le puede pasar al llm para controlar cuan creativo
+* Temperatura : Valor que se le puede pasar al llm para controlar cuan creativo (Probabilidad)
   * 0 : Practicamente deterministico, siempre responde igual
+     * Generalmente para chatbots enterprise si quiero previsibilidad en la respuestas se usan temperaturas bajas 0.1
   * 2 : Super creativo
+* TopP : Determina la cantidad de palabras posibles a elegir (Cantidad de palabras posibles)
+  * 0 : Elije 1 sola palabria posible siguiente
+  * 1 : Muchas proximas paalabras posible
+
+# Links Utiles
+
+* https://gallantlab.org/viewer-huth-2016/
 
 # Rag
 
