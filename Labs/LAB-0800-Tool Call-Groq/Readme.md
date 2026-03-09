@@ -293,6 +293,7 @@ respuesta = cliente.chat.completions.create(
 mensaje = respuesta.choices[0].message
 
 if mensaje.tool_calls:
+    print("Llamada a tool Call")
 
     tool_call = mensaje.tool_calls[0]
 
