@@ -30,7 +30,7 @@
 
 ### Speech-To-Text
 
-'''html
+```html
 <!DOCTYPE html>
 <html>
 
@@ -57,7 +57,7 @@
 </body>
 
 </html>
-'''
+```
 
 ### Text-To-Speech
 
