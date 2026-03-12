@@ -244,4 +244,77 @@ intf.launch()
 * Para armar este codigo me ayudo Claude
   * https://claude.ai/share/4560ae43-b570-461d-8462-fbbe3e1cca9a
 
-# Tools
+# Tools 
+
+* Hasta ahora los LLM no tienen la capacidad de accion. Este es como funcion hasta ahora
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuario
+    participant A as API Anthropic
+    participant M as Modelo (Claude)
+
+    U->>A: POST /v1/messages<br/>{model, messages, system}
+    activate A
+    A->>M: Procesa el prompt
+    activate M
+    Note over M: Genera respuesta<br/>directamente con<br/>su conocimiento
+    M-->>A: Respuesta generada
+    deactivate M
+    A-->>U: 200 OK<br/>{content: [{type: "text", text: "..."}],<br/>stop_reason: "end_turn"}
+    deactivate A
+```
+
+* Algunos modelos soportan Tool Calling
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuario
+    participant A as API Anthropic
+    participant M as Modelo (Claude)
+    participant T as Herramienta (Tool)
+
+    U->>A: POST /v1/messages<br/>{model, messages, tools: [...]}
+    activate A
+    A->>M: Procesa el prompt + definición de tools
+    activate M
+    Note over M: Decide usar tool #1
+    M-->>A: stop_reason: "tool_use"<br/>{type: "tool_use", id: "tool_1",<br/>name: "get_weather", input: {...}}
+    deactivate M
+    A-->>U: 200 OK — primer stop
+    deactivate A
+
+    Note over U: Ejecuta la herramienta localmente
+    U->>T: Llama get_weather(input)
+    activate T
+    T-->>U: Resultado tool #1
+    deactivate T
+
+    U->>A: POST /v1/messages<br/>{messages: [..., {role:"user",<br/>content:[{type:"tool_result", tool_use_id:"tool_1"}]}]}
+    activate A
+    A->>M: Procesa historial + resultado tool #1
+    activate M
+    Note over M: Decide usar tool #2
+    M-->>A: stop_reason: "tool_use"<br/>{type: "tool_use", id: "tool_2",<br/>name: "search_news", input: {...}}
+    deactivate M
+    A-->>U: 200 OK — segundo stop
+    deactivate A
+
+    Note over U: Ejecuta la herramienta localmente
+    U->>T: Llama search_news(input)
+    activate T
+    T-->>U: Resultado tool #2
+    deactivate T
+
+    U->>A: POST /v1/messages<br/>{messages: [..., tool_result tool_2]}
+    activate A
+    A->>M: Procesa historial + resultado tool #2
+    activate M
+    Note over M: Tiene todo lo necesario.<br/>Genera respuesta final.
+    M-->>A: stop_reason: "end_turn"<br/>{type: "text", text: "Respuesta final..."}
+    deactivate M
+    A-->>U: 200 OK — respuesta final
+    deactivate A
+```
