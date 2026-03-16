@@ -57,7 +57,7 @@ def procesar_prompt(prompt):
             base_url="https://api.groq.com/openai/v1"
         )
         respuesta = client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="openai/gpt-oss-20b",
             messages=[
                 {"role": "system", "content": "Eres un asistente útil y conciso."},
                 {"role": "user", "content": prompt}
