@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "c:\\Cursos\\python-ia-agentes\\Cursos\\85687-Ma-Jue-No\\clase-ocho\\cursor-mcp-demo\\logs\\.f4afd4ed36493b4a907b431a5d0125e95b8bf9cb-audit.json",
+    "files": [
+        {
+            "date": 1773791526047,
+            "name": "c:\\Cursos\\python-ia-agentes\\Cursos\\85687-Ma-Jue-No\\clase-ocho\\cursor-mcp-demo\\logs\\mcp-puppeteer-2026-03-17.log",
+            "hash": "7508840c924a89ba324fd58d68310586b3c39629a5031b0cfaa865f692f4c795"
+        }
+    ],
+    "hashType": "sha256"
+}
