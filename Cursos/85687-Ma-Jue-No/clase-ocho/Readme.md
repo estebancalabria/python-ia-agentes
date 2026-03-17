@@ -190,4 +190,10 @@ while respuesta.choices[0].message.tool_calls:
 print(respuesta.choices[0].message.content)
 ```
 
+# Model Context Protocol
+
+> https://www.instagram.com/p/DI0LLJAuUno/?img_index=1
+
+
+
 * 
