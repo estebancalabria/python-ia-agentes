@@ -9,7 +9,8 @@
 
 # Herramientas
 
-> https://anythingllm.com/
+* https://anythingllm.com/
+* Claude Desktop : https://claude.com/download
 
 # Colab de la clase
 
@@ -192,8 +193,15 @@ print(respuesta.choices[0].message.content)
 
 # Model Context Protocol
 
-> https://www.instagram.com/p/DI0LLJAuUno/?img_index=1
+* Es un protocolo que pretende estandarizarse creado por Anthropic
+* Links
+  * https://www.instagram.com/p/DI0LLJAuUno/?img_index=1
+  * https://modelcontextprotocol.io/docs/getting-started/intro
 
-
-
-* 
+* El MCP Permite
+   * Registrar herramientas dinamicamente en algun Cliente MCP (VSCode, Cursor, Antigravity, AnythinLLM, Claude Desktop, Claude Code)
+   * Desarroolar herramientas que sean "inyectables" en esos cliente, Servidor MCP
+   * Utilizar una gran cantidad de herramientas ya diponibles en repositorios publicos
+      * Se puede ver las herramientas disponibles en :
+         * https://modelcontextprotocol.io/examples
+         * https://github.com/modelcontextprotocol/servers?tab=readme-ov-file#-resources
