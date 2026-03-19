@@ -245,3 +245,4 @@ print(f"Resultado ejecucion {resultado}")
 
 # Un caso real de un agente no conversacional
 
+> Vimos un ejemplo de un agente conversacional que postea solo en Twitter
