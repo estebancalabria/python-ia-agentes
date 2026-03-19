@@ -34,6 +34,120 @@
 * Altarnativa a Colab mas pro
 > https://streamlit.io/
 
+* Para instalarlo
+```cmd
+pip install streamlit openai
+```
+
+```cmd
+streamlit --version
+Streamlit, version 1.55.0
+```
+
+* (Pueden instalarlo en un entorno virtual)
+
+* El codigo de nuestro chatbot en streamlit
+```python
+import streamlit as st
+from openai import OpenAI
+
+st.set_page_config(page_title="Chat con Groq", page_icon="🚀")
+
+st.title("🚀 Chat con Groq (Streamlit)")
+
+# Inicializar estado
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+if "api_key" not in st.session_state:
+    st.session_state.api_key = None
+
+
+# Sidebar para API Key
+st.sidebar.header("Configuración")
+api_key_input = st.sidebar.text_input(
+    "🔑 Ingresa tu GROQ_API_KEY",
+    type="password"
+)
+
+if st.sidebar.button("Establecer API Key"):
+    st.session_state.api_key = api_key_input
+    st.sidebar.success("API Key configurada correctamente")
+
+
+# Función para llamar a Groq
+def consultar_groq(prompt):
+
+    if not st.session_state.api_key:
+        return "❌ Primero debes configurar tu API Key."
+
+    try:
+        client = OpenAI(
+            api_key=st.session_state.api_key,
+            base_url="https://api.groq.com/openai/v1"
+        )
+
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": "Eres un asistente útil y conciso."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        return response.choices[0].message.content
+
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
+# Mostrar historial
+for message in st.session_state.chat_history:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+
+# Input de usuario
+if prompt := st.chat_input("Escribe tu mensaje..."):
+
+    # Guardar mensaje usuario
+    st.session_state.chat_history.append(
+        {"role": "user", "content": prompt}
+    )
+
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    # Obtener respuesta
+    respuesta = consultar_groq(prompt)
+
+    # Guardar respuesta
+    st.session_state.chat_history.append(
+        {"role": "assistant", "content": respuesta}
+    )
+
+    with st.chat_message("assistant"):
+        st.markdown(respuesta)
+
+
+# Botón limpiar
+if st.button("🧹 Limpiar conversación"):
+    st.session_state.chat_history = []
+    st.rerun()
+```
+
+* Para ejecutarlo
+
+```cmd
+streamlit run app.py
+```
+
+Ir al navegador en la url que se propone
+
+```
+http://localhost:8501
+```
+
 # Generacion de Imagenes
 
 * Alternativas
