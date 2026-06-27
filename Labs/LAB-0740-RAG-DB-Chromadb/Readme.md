@@ -1,32 +1,28 @@
-# 🧪 Laboratorio: Sistema RAG Básico con ChromaDB (Persistente) 🚀
+# 🧪 Laboratorio: Sistema RAG Básico con ChromaDB (Persistente)
 
 ## 📝 Introducción
 
-En este laboratorio vamos a construir un **sistema RAG básico pero persistente** usando:
+En este laboratorio construimos un **sistema RAG persistente** usando:
 
 * Python
-* Hugging Face
 * SentenceTransformers
 * ChromaDB
 
-A diferencia del laboratorio anterior:
-
-✅ Los documentos se guardan en disco
-✅ No se pierden al cerrar el programa
-✅ No usamos OpenAI
-
-Todo funciona en consola.
+✅ Los documentos se guardan en disco  
+✅ No se pierden al cerrar el programa  
+✅ Sin OpenAI  
+✅ Todo en consola, sin funciones wrapper
 
 ---
 
-# 📋 Requisitos
+## 📋 Requisitos
 
 * Python 3.9+
 * Pip instalado
 
 ---
 
-# 🔧 Paso 1: Instalar dependencias
+## 🔧 Paso 1: Instalar dependencias
 
 ```bash
 pip install chromadb sentence-transformers
@@ -34,143 +30,81 @@ pip install chromadb sentence-transformers
 
 ---
 
-# 📚 Paso 2: Importar bibliotecas
+## 📚 Paso 2: Importar bibliotecas y cargar el modelo
 
 ```python
 import chromadb
 from sentence_transformers import SentenceTransformer
+
+modelo = SentenceTransformer('all-MiniLM-L6-v2')
 ```
 
 ---
 
-# 💡 Paso 3: Crear cliente persistente
-
-Aquí está la diferencia clave.
-
-Chroma permite persistencia automática indicando una carpeta:
+## 💾 Paso 3: Definir documentos y generar embeddings
 
 ```python
-client = chromadb.PersistentClient(path="./mi_base_rag")
+documentos = [
+    "Python es un lenguaje de programación muy popular.",
+    "SentenceTransformers permite generar embeddings fácilmente.",
+    "Los sistemas RAG combinan recuperación de información con generación de texto."
+]
+
+embeddings = modelo.encode(documentos).tolist()
 ```
 
-👉 Esto crea una carpeta `mi_base_rag` donde se guardan los vectores.
+👉 `encode()` devuelve un array de NumPy. Con `.tolist()` lo convertimos a lista de Python, que es lo que espera ChromaDB.
 
 ---
 
-# 🧠 Paso 4: Cargar modelo de embeddings
+## 🗄️ Paso 4: Crear cliente persistente y colección
 
 ```python
-modelo_embeddings = SentenceTransformer('all-MiniLM-L6-v2')
+client = chromadb.PersistentClient(path="./db4")
+
+collection = client.create_collection(name="faq")
 ```
 
-Creamos una función para que Chroma use este modelo:
+👉 `PersistentClient` guarda todo en la carpeta `./db4`. La próxima vez que ejecutes el script, los datos siguen ahí.
 
-```python
-def generar_embedding(textos):
-    return modelo_embeddings.encode(textos).tolist()
-```
+> ⚠️ Si ya existe la colección (segunda ejecución), `create_collection` va a fallar. Podés reemplazarlo por `get_or_create_collection` para evitar el error.
 
 ---
 
-# 📄 Paso 5: Crear colección
+## 📥 Paso 5: Indexar los documentos
 
 ```python
-collection = client.get_or_create_collection(
-    name="documentos",
-    embedding_function=generar_embedding
+collection.add(
+    documents=documentos,
+    embeddings=embeddings,
+    ids=[str(i) for i in range(len(documentos))]
 )
 ```
 
-Si no existe → la crea
-Si ya existe → la reutiliza
-
-Persistencia automática ✅
+👉 Los `ids` son strings obligatorios. Acá los generamos automáticamente: `"0"`, `"1"`, `"2"`.
 
 ---
 
-# 📥 Paso 6: Agregar documentos (solo la primera vez)
+## 🔍 Paso 6: Hacer una consulta
 
 ```python
-if collection.count() == 0:
-    
-    documentos = [
-        "Python es un lenguaje de programación muy popular.",
-        "SentenceTransformers permite generar embeddings fácilmente.",
-        "Los sistemas RAG combinan recuperación de información con generación de texto."
-    ]
-    
-    collection.add(
-        documents=documentos,
-        ids=["doc1", "doc2", "doc3"]
-    )
-    
-    print("Documentos cargados por primera vez.\n")
+pregunta = input("Pregunta: ")
+
+embedding_pregunta = modelo.encode([pregunta]).tolist()
+
+resultado = collection.query(
+    query_embeddings=embedding_pregunta,
+    n_results=3
+)
+
+print(resultado["documents"][0])
 ```
 
-Si ejecutás el script otra vez
-→ No vuelve a cargar duplicados.
+👉 `resultado["documents"]` es una lista de listas (una por cada query). Como mandamos una sola pregunta, accedemos al índice `[0]` para obtener los documentos relevantes.
 
 ---
 
-# 🔍 Paso 7: Función de recuperación
-
-```python
-def recuperar_contexto(pregunta, top_k=2):
-    
-    resultados = collection.query(
-        query_texts=[pregunta],
-        n_results=top_k
-    )
-    
-    documentos_relevantes = resultados["documents"][0]
-    
-    contexto = "\n".join(documentos_relevantes)
-    return contexto
-```
-
-Observá que:
-
-👉 No calculamos similitud manual
-👉 Chroma lo hace internamente
-
----
-
-# 🧠 Paso 8: Loop interactivo
-
-```python
-def iniciar_rag():
-    print("====================================")
-    print(" Sistema RAG con ChromaDB ")
-    print(" Persistente y en Consola ")
-    print(" Escribe 'salir' para terminar")
-    print("====================================\n")
-    
-    while True:
-        pregunta = input("Tu pregunta: ")
-        
-        if pregunta.lower() == "salir":
-            print("Saliendo del sistema...")
-            break
-        
-        contexto = recuperar_contexto(pregunta)
-        
-        print("\n--- Contexto relevante encontrado ---")
-        print(contexto)
-        print("--------------------------------------\n")
-```
-
----
-
-# 🚀 Paso 9: Ejecutar
-
-```python
-if __name__ == "__main__":
-    iniciar_rag()
-```
-
----
-
-# 🧩 Código Completo
+## 🧩 Código Completo
 
 ```python
 # pip install chromadb sentence-transformers
@@ -178,96 +112,61 @@ if __name__ == "__main__":
 import chromadb
 from sentence_transformers import SentenceTransformer
 
-# 1️⃣ Cliente persistente
-client = chromadb.PersistentClient(path="./mi_base_rag")
+# 1️⃣ Modelo de embeddings
+modelo = SentenceTransformer('all-MiniLM-L6-v2')
 
-# 2️⃣ Modelo embeddings
-modelo_embeddings = SentenceTransformer('all-MiniLM-L6-v2')
+# 2️⃣ Documentos y sus embeddings
+documentos = [
+    "Python es un lenguaje de programación muy popular.",
+    "SentenceTransformers permite generar embeddings fácilmente.",
+    "Los sistemas RAG combinan recuperación de información con generación de texto."
+]
 
-def generar_embedding(textos):
-    return modelo_embeddings.encode(textos).tolist()
+embeddings = modelo.encode(documentos).tolist()
 
-# 3️⃣ Colección
-collection = client.get_or_create_collection(
-    name="documentos",
-    embedding_function=generar_embedding
+# 3️⃣ Cliente persistente
+client = chromadb.PersistentClient(path="./db4")
+
+# 4️⃣ Colección
+collection = client.create_collection(name="faq")
+
+# 5️⃣ Indexar documentos
+collection.add(
+    documents=documentos,
+    embeddings=embeddings,
+    ids=[str(i) for i in range(len(documentos))]
 )
 
-# 4️⃣ Cargar documentos solo si no existen
-if collection.count() == 0:
-    
-    documentos = [
-        "Python es un lenguaje de programación muy popular.",
-        "SentenceTransformers permite generar embeddings fácilmente.",
-        "Los sistemas RAG combinan recuperación de información con generación de texto."
-    ]
-    
-    collection.add(
-        documents=documentos,
-        ids=["doc1", "doc2", "doc3"]
-    )
-    
-    print("Documentos cargados por primera vez.\n")
+# 6️⃣ Consulta
+pregunta = input("Pregunta: ")
 
-# 5️⃣ Función de recuperación
-def recuperar_contexto(pregunta, top_k=2):
-    
-    resultados = collection.query(
-        query_texts=[pregunta],
-        n_results=top_k
-    )
-    
-    documentos_relevantes = resultados["documents"][0]
-    
-    contexto = "\n".join(documentos_relevantes)
-    return contexto
+embedding_pregunta = modelo.encode([pregunta]).tolist()
 
-# 6️⃣ Loop principal
-def iniciar_rag():
-    print("====================================")
-    print(" Sistema RAG con ChromaDB ")
-    print(" Persistente y en Consola ")
-    print(" Escribe 'salir' para terminar")
-    print("====================================\n")
-    
-    while True:
-        pregunta = input("Tu pregunta: ")
-        
-        if pregunta.lower() == "salir":
-            print("Saliendo del sistema...")
-            break
-        
-        contexto = recuperar_contexto(pregunta)
-        
-        print("\n--- Contexto relevante encontrado ---")
-        print(contexto)
-        print("--------------------------------------\n")
+resultado = collection.query(
+    query_embeddings=embedding_pregunta,
+    n_results=3
+)
 
-# 7️⃣ Ejecutar
-if __name__ == "__main__":
-    iniciar_rag()
+print(resultado["documents"][0])
 ```
 
 ---
 
-# 🎯 Qué cambió respecto al laboratorio anterior
+## 🎯 Diferencias respecto a la versión anterior
 
-| RAG simple          | RAG con Chroma |
-| ------------------- | -------------- |
-| RAM                 | Disco          |
-| Embeddings manuales | Automáticos    |
-| Similaridad manual  | Automática     |
-| No persistente      | Persistente    |
+| Versión anterior | Esta versión |
+|---|---|
+| Embeddings delegados a Chroma | Embeddings generados manualmente con `encode()` |
+| Funciones wrapper (`recuperar_contexto`, `iniciar_rag`) | Código directo, sin funciones |
+| `query_texts` | `query_embeddings` |
+| Loop interactivo | Una sola consulta |
 
 ---
 
-# 🏁 Conclusión
+## 🏁 Conclusión
 
-Ahora tenés un:
-
-✅ RAG persistente
-✅ Base vectorial real
-✅ Sin OpenAI
-✅ Ejecutable desde terminal
-✅ Más cercano a producción
-
+✅ RAG persistente en disco  
+✅ Control explícito de los embeddings  
+✅ Sin funciones wrapper: cada paso visible  
+✅ Sin OpenAI  
+✅ Base para escalar a pipelines más complejos
