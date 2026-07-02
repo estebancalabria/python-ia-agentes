@@ -86,8 +86,14 @@ def recuperar_contexto(pregunta, top_k=2):
 ## Paso 6: Generar respuesta con el LLM
 
 ```python
+from openai import OpenAI
+import os
+
 def generar_respuesta_llm(contexto, pregunta, api_key):
-    cliente = Groq(api_key=api_key)
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://api.groq.com/openai/v1",
+    )
 
     prompt = f"""
 Usa el siguiente contexto para responder la pregunta.
@@ -99,14 +105,14 @@ Pregunta:
 {pregunta}
 
 Respuesta:
-"""
+""".strip()
 
-    respuesta = cliente.chat.completions.create(
+    response = client.responses.create(
         model="llama3-8b-8192",
-        messages=[{"role": "user", "content": prompt}]
+        input=prompt,
     )
 
-    return respuesta.choices[0].message.content
+    return response.output_text
 ```
 
 ---
